@@ -173,45 +173,51 @@ def splinter_gangying(url):
 				soup = BeautifulSoup(html)
 				table = soup.find_all('table', id="resList")
 
-				for row in table[0].find_all('tr')[2:]:
-					count = 0
-					row_result = []
-					columns = row.find_all('td')
-					if len(columns) > 0:
-						for column in columns[0:10]:
-							if count == 0 or count == 5:
-								column_item = column.find_all('a')[0].get_text()
-								row_result.append(column_item)
-							else:
-								row_result.append(column.get_text())
-							count += 1
-						# Add the district name
-						row_result.append(now.strftime("%Y%m%d %H:%M"))
-						row_result.append('钢赢网平台')
-						# table_result.append(row_result)
-						print(row_result)
-						df_result = df_result.append(pd.Series(row_result), ignore_index=True)
+				# for row in table[0].find_all('tr')[2:]:
+				# re_tr = 'summaryRes_' + re.compile(\d+)
+				# for row in table[0].find_all('tbody', attrs={'id':re.compile('summaryRes_\d+')})[0].fina_all('tr'):
+				for tbody in table[0].find_all('tbody', attrs={'id':re.compile('summaryRes_\d+')}):
+					for row in tbody.find_all('tr'):
+						count = 0
+						row_result = []
+						columns = row.find_all('td')
+						if len(columns) > 0:
+							for column in columns[0:10]:
+								if count == 0 or count == 5:
+									column_item = column.find_all('a')[0].get_text()
+									row_result.append(column_item)
+								else:
+									row_result.append(column.get_text())
+								count += 1
+							# Add the district name
+							row_result.append(now.strftime("%Y%m%d %H:%M"))
+							row_result.append('钢赢网平台')
+							# table_result.append(row_result)
+							print(row_result)
+							df_result = df_result.append(pd.Series(row_result), ignore_index=True)
 
-						if page == 50:
-							current_dir = os.getcwd()
-							# file_zhaogang = open(current_dir + '\\zhaogang.csv', 'w')
-							file_name = current_dir + '/gangying.csv'
-							# file_zhaogang.write(df_result)
-							# df_result.to_csv(file_name, index=False, encoding='utf-8')
-							df_result.to_csv(file_name, index=False, encoding="gb2312")
-						elif page > 50 and page%50 == 0:
-							current_dir = os.getcwd()
-							# file_zhaogang = open(current_dir + '\\zhaogang.csv', 'w')
-							file_name = current_dir + '/gangying.csv'
-							with open(file_name, 'a') as f:
-								df_result.to_csv(f, index=False, encoding="gb2312", header=False)
-						elif page == total_page:
-							current_dir = os.getcwd()
-							# file_zhaogang = open(current_dir + '\\zhaogang.csv', 'w')
-							file_name = current_dir + '/gangying.csv'
-							with open(file_name, 'a') as f:
-								df_result.to_csv(f, index=False, encoding="gb2312", header=False)
-
+				if page == 50:
+					current_dir = os.getcwd()
+					# file_zhaogang = open(current_dir + '\\zhaogang.csv', 'w')
+					file_name = current_dir + '/gangying.csv'
+					# file_zhaogang.write(df_result)
+					# df_result.to_csv(file_name, index=False, encoding='utf-8')
+					df_result.to_csv(file_name, index=False, encoding="gb2312")
+					df_result.drop(df_result.index[1:(len(df_result)-1)], inplace=True)
+				elif page > 50 and page%50 == 0:
+					current_dir = os.getcwd()
+					# file_zhaogang = open(current_dir + '\\zhaogang.csv', 'w')
+					file_name = current_dir + '/gangying.csv'
+					with open(file_name, 'a') as f:
+						df_result.to_csv(f, index=False, encoding="gb2312", header=False)
+					df_result.drop(df_result.index[1:(len(df_result)-1)], inplace=True)
+				elif page == total_page:
+					current_dir = os.getcwd()
+					# file_zhaogang = open(current_dir + '\\zhaogang.csv', 'w')
+					file_name = current_dir + '/gangying.csv'
+					with open(file_name, 'a') as f:
+						df_result.to_csv(f, index=False, encoding="gb2312", header=False)
+					df_result.drop(df_result.index[1:(len(df_result)-1)], inplace=True)
 					# print(df_result)
 
 				# print(new_table)
